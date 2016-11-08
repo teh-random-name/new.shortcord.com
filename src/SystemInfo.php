@@ -26,18 +26,25 @@ class SystemInfo {
                 'uptime' => $this->uptime,
                 'disk' => $this->diskinfo,
                 'ram' => $this->raminfo,
-                'temps' => $this->getTemps()
+                'temps' => $this->getTemps()['temps'],
+                'fans' => $this->getTemps()['fans']
                 //'vnstat' => $this->networkinfo
             ];
 	}
 
     private function getTemps(): array {
         $data = '';
-        exec('sh /var/www/sensorBuild.sh', $data);
+        $result = -1;
+        exec('sh ' . dirname(__FILE__) . '/../bin/sensorBuild.sh', $data, $result);
+
+        if ($result != 0) {
+            return null;
+        }
+
         // Decode the json return and auto convert stdClass to array
         $decodedPayload = json_decode($data[0], $assoc = true);
         //return only the values
-        return $decodedPayload['temps'];
+        return $decodedPayload;
     }
 
 	private function kb2bytes($kb): int {
