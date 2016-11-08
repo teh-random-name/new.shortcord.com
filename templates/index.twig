@@ -1,0 +1,100 @@
+{% extends "bootstrap.twig" %}
+
+{% block title %}
+Backend Status
+{% endblock %}
+
+{% block head %}
+<style>
+html {
+    background: url('https://i.imgur.com/u5xeXvq.png') no-repeat center center fixed #373737;
+    background-size: cover;
+}
+body {
+    background: transparent;
+    padding-top: 15px;
+}
+
+.list-group-item {
+    background-color: inherit;
+    color: #fff;
+    border: unset;
+}
+
+.card {
+    background-color: rgba(128, 128, 128, 0.75);
+}
+
+.text-muted {
+    color: #8f9ca5 !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><small class="text-muted">Local Time</small> <span id="date"></span></li>
+                    <li class="list-group-item"><small class="text-muted">Uptime</small> <span id="uptime"></span></li>
+                    <li class="list-group-item"><small class="text-muted">Ram Usage</small> <span id="memory"></span></li>
+                    <li class="list-group-item"><small class="text-muted">Swap Usage</small> <span id="swap"></span></li>
+                    <li class="list-group-item"><small class="text-muted">Disk Usage</small> <span id="disk"></span></li>
+                    <li class="list-group-item"><small class="text-muted">CPU Temp</small> <span id="cputemp"></span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card" style="background-color: rgba(128, 128, 128, 0.75);">
+                <img class="img-fluid" src="/netload.png">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action" href="https://shortcord.com/github" target="_blank">Github</a>
+                    <a class="list-group-item list-group-item-action" href="https://shortcord.com/" target="_blank">Short Cord</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+//I fucking hate javascript, can you tell?
+function getstatus() {
+	$.ajax({
+	method: "GET",
+	url: "/info.json",
+	dataType: "json"
+	}).done(function(data) {
+        var uptimesec = data.uptime.seconds;
+        var uptimemin = data.uptime.minutes;
+        var uptimehour = data.uptime.hours;
+
+        if (uptimesec < 10)
+            uptimesec = '0'+uptimesec;
+
+        if (uptimemin < 10)
+            uptimemin = '0'+uptimemin;
+
+        if (uptimehour < 10)
+            uptimehour = '0'+uptimehour;
+
+        $('#date').html(data.date);
+        $('#uptime').html(data.uptime.days + (data.uptime.days === 1 ? ' day, ' : ' days, ') + uptimehour + ':'+ uptimemin +':'+ uptimesec);
+        $('#memory').html(data.ram.used.ram.size + ' of ' + data.ram.total.ram);
+        $('#swap').html(data.ram.used.swap.size + ' of ' + data.ram.total.swap);
+        $('#disk').html(data.disk.used + ' of ' + data.disk.total);
+        $('#cputemp').html(data.temps.cpu + '\u2103' + ' or ' + ((data.temps.cpu * (9/5)) + 32) + '\u2109');
+	});
+}
+getstatus();
+var statloop = window.setInterval(getstatus, 1000);
+//$('#js-test').css('top', window.innerHeight + 'px');
+</script>
+{% endblock %}

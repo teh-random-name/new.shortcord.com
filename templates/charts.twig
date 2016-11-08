@@ -1,0 +1,123 @@
+{% extends "base.twig" %}
+
+{% block title %}
+Backend Status Dev
+{% endblock %}
+
+{% block head %}
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noodp" />
+<meta name="description" content="Status page | shortcord backend" />
+<link rel="icon" type="image/png" href="https://www.shortcord.com/favicon.png"/>
+<link rel="shortcut icon" href="https://www.shortcord.com/favicon.png"/>
+<link rel="apple-touch-icon" href="https://www.shortcord.com/favicon.png"/>
+<link rel="apple-touch-icon" sizes="76x76" href="https://www.shortcord.com/favicon.png"/>
+<link rel="apple-touch-icon" sizes="120x120" href="https://www.shortcord.com/favicon.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="https://www.shortcord.com/favicon.png"/>
+<link rel="stylesheet" href="https://edge.shortcord.com/css/nexa-font.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+<script>
+function getstatus(callback) {
+	var toReturn = {};
+	
+	$.ajax({
+	method: "GET",
+	url: "https://edge.shortcord.com/info.json",
+	dataType: "json",
+	}).success(function(jsonData) {	
+		var diskchartData = {
+			labels: [
+				"Free",
+				"Used",
+			],
+			datasets: [
+				{
+					data: [
+						2000 - jsonData.disk.used.substring(0, jsonData.disk.used.length -2),
+						jsonData.disk.used.substring(0, jsonData.disk.used.length -2)
+					],
+					backgroundColor: [
+						"#36A2EB",
+						"#FF6384"
+					],
+					hoverBackgroundColor: [
+						"#36A2EB",
+						"#FF6384"
+					]
+				}]
+		};
+
+		var chartData = {
+			labels: [
+				"Free",
+				"Used",
+			],
+			datasets: [
+				{
+					data: [
+						jsonData.ram.used.ram.percent,
+						jsonData.ram.free.ram.percent
+					],
+					backgroundColor: [
+						"#36A2EB",
+						"#FF6384"
+					],
+					hoverBackgroundColor: [
+						"#36A2EB",
+						"#FF6384"
+					]
+				}]
+		};
+		
+		toReturn.disk = diskchartData;
+		toReturn.mem = chartData;
+		callback(toReturn);
+	});
+}
+var memChartObj, hddChartObj;
+$(function() {
+	var memChart = $('#memChart');
+	var hddChart = $('#hddChart');
+	
+	
+	getstatus(function(chartData){
+		
+		memChartObj = new Chart(memChart, {
+			type: 'doughnut',
+			data: chartData.mem,
+			animation: {
+				animateScale: true,
+				responsive: true,
+				maintainAspectRatio: false
+			}
+		});
+
+		hddChartObj = new Chart(hddChart, {
+			type: 'doughnut',
+			data: chartData.disk,
+			animation: {
+				animateScale: true,
+				responsive: true,
+				maintainAspectRatio: false
+			}
+		});
+	});
+	
+	var statloop = window.setInterval(function(){
+		getstatus(function(chartData){
+			memChartObj.data.datasets[0].data = chartData.mem.datasets[0].data;
+			hddChartObj.data.datasets[0].data = chartData.disk.datasets[0].data;
+			memChartObj.update();
+			hddChartObj.update();
+		});
+	}, 1000);
+});
+//getstatus();
+//var statloop = window.setInterval(getstatus, 1000);
+</script>
+{% endblock %}
+
+{% block content %}
+<canvas id="memChart" style="max-width:200px;max-height:200px;"></canvas>
+<canvas id="hddChart" style="max-width:200px;max-height:200px;"></canvas>
+{% endblock %}
