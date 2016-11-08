@@ -90,7 +90,7 @@ function getstatus() {
         $('#memory').html(data.ram.used.ram.size + ' of ' + data.ram.total.ram);
         $('#swap').html(data.ram.used.swap.size + ' of ' + data.ram.total.swap);
         $('#disk').html(data.disk.used + ' of ' + data.disk.total);
-        $('#cputemp').html(data.temps.cpu + '\u2103' + ' or ' + ((data.temps.cpu * (9/5)) + 32) + '\u2109');
+        $('#cputemp').html(data.temps.cpu + '\u2103' + ' or ' + Math.round(((data.temps.cpu * (9/5)) + 32)*10)/10+ '\u2109');
 	});
 }
 getstatus();
