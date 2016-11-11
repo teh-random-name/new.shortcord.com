@@ -7,7 +7,7 @@
 
 # cut is just used to pre-truncate the float, it's not /really/ needed
 
-TEMPCPU=$(sensors -u | grep 'temp2_input' | awk '{print $2}' | cut -b1,2,3,4,5) # thermal diode
+TEMPCPU=$(sensors -u | grep 'temp2_input' | awk '{print $2}' | cut -b1,2,3,4) # thermal diode
 EXITFANSPEED=$(sensors -u | grep 'fan1_input' | awk '{print $2}' | cut -b1,2,3,4) # water block exhaust fan
 PUMPFANSPEED=$(sensors -u | grep 'fan2_input' | awk '{print $2}' | cut -b1,2,3,4) # water block pump 
 

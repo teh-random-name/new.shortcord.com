@@ -77,13 +77,13 @@ function getstatus() {
         var uptimehour = data.uptime.hours;
 
         if (uptimesec < 10)
-            uptimesec = '0'+uptimesec;
+            uptimesec = '0' + uptimesec;
 
         if (uptimemin < 10)
-            uptimemin = '0'+uptimemin;
+            uptimemin = '0' + uptimemin;
 
         if (uptimehour < 10)
-            uptimehour = '0'+uptimehour;
+            uptimehour = '0' + uptimehour;
 
         $('#date').html(data.date);
         $('#uptime').html(data.uptime.days + (data.uptime.days === 1 ? ' day, ' : ' days, ') + uptimehour + ':'+ uptimemin +':'+ uptimesec);
